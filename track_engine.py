@@ -17,7 +17,7 @@ def convert_bbox_to_x(bbox):
 class TrackEngine():
   def __init__(self) -> None:
     self.tracks = []
-    self.max_missed_frames = 15
+    self.max_missed_frames = 5
     self.non_assignment_cost = 50
 
   def calculate_distance(self, detection, track):
