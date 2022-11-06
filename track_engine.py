@@ -46,6 +46,7 @@ class TrackEngine():
         for i in range(m):
             track = Tracker(convert_bbox_to_x(detections[i]))
             self.tracks.append(track)
+            n += 1
 
     cost_mat = self.calculate_cost_matrix(detections)
 
@@ -55,6 +56,7 @@ class TrackEngine():
     for _ in range(n):
         assignment.append(-1)
     row_ind, col_ind = linear_sum_assignment(cost_mat)
+    # print(row_ind, col_ind)
     for i in range(len(row_ind)):
         assignment[row_ind[i]] = col_ind[i]
 
@@ -113,7 +115,7 @@ class TrackEngine():
           print("ERROR: id is greater than length of tracks")
 
   def predict_all(self):
-    cur_states = []
+    predicted_states = []
     for i in range(len(self.tracks)):
-      cur_states.append(self.tracks[i].get_state()[0])
-    return cur_states
+      predicted_states.append(self.tracks[i].predict()[0])
+    return predicted_states
