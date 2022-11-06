@@ -18,7 +18,7 @@ class TrackEngine():
   def __init__(self) -> None:
     self.tracks = []
     self.max_missed_frames = 5
-    self.non_assignment_cost = 50
+    self.non_assignment_cost = 100
 
   def calculate_distance(self, detection, track):
     det_center = ((detection[0] + detection[2])/2., (detection[1] + detection[3])/2.)
