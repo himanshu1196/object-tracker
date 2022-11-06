@@ -22,7 +22,7 @@ class TrackEngine():
 
   def calculate_distance(self, detection, track):
     det_center = ((detection[0] + detection[2])/2., (detection[1] + detection[3])/2.)
-    trk_s = track.get_state()
+    trk_s = track.get_state()[0]
     trk_center = ((trk_s[0] + trk_s[2])/2., (trk_s[1] + trk_s[3])/2.)
     distance = math.sqrt((trk_center[0] - det_center[0])**2 + (trk_center[1] - det_center[1])**2)
     return distance
@@ -33,7 +33,7 @@ class TrackEngine():
     cost_mat = np.zeros(shape = (n, m))
     for i in range(n):
       for j in range(m):
-        cost_mat[i,j] = self.calculate_distance(self, detections[j], self.tracks[i])
+        cost_mat[i,j] = self.calculate_distance(detections[j], self.tracks[i])
 
     return cost_mat
 
@@ -47,7 +47,7 @@ class TrackEngine():
             track = Tracker(convert_bbox_to_x(detections[i]))
             self.tracks.append(track)
 
-    cost_mat = self.calculate_cost_matrix(self, detections)
+    cost_mat = self.calculate_cost_matrix(detections)
 
     # Using Hungarian Algorithm assign the correct detected measurements
     # to predicted tracks
@@ -83,7 +83,7 @@ class TrackEngine():
     return assignment, un_assigned_tracks, un_assigned_detects
   
   def update_tracks_for_detects(self, detections):
-    assignment, un_assigned_tracks, un_assigned_detects = self.assign_detections_to_tracks(self, detections)
+    assignment, un_assigned_tracks, un_assigned_detects = self.assign_detections_to_tracks(detections)
 
     # Update KalmanFilter state, lastResults and tracks trace
     for i in range(len(assignment)):
@@ -111,3 +111,9 @@ class TrackEngine():
           del assignment[id]
         else:
           print("ERROR: id is greater than length of tracks")
+
+  def predict_all(self):
+    cur_states = []
+    for i in range(len(self.tracks)):
+      cur_states.append(self.tracks[i].get_state()[0])
+    return cur_states
