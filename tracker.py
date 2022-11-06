@@ -25,13 +25,13 @@ class Tracker():
 
     # Define the covariance matrix. Here I take advantage of the fact that P already contains np.eye(dim_x), and just multiply by the uncertainty
     self.kf.P[:2,:2] *= 10.
-    self.kf.P[2:,2:] *= 1000. #give high uncertainty to the unobservable initial velocities
+    self.kf.P[2:,2:] *= 100. #give high uncertainty to the unobservable initial velocities
 
     # Now assign the measurement noise.
-    self.kf.R[:,:] *= 100.
+    self.kf.R[:,:] *= 1000.
 
     # assign the process noise. 
-    self.kf.Q *= 0.1
+    self.kf.Q *= 1.
 
     self.time_since_update = 0
     self.id = Tracker.count
