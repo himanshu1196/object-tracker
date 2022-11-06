@@ -37,6 +37,7 @@ class Tracker():
     self.id = Tracker.count
     Tracker.count += 1
     self.history = []
+    self.max_hist_length = 10
     self.hits = 0
     self.hit_streak = 0
     self.age = 0
@@ -45,8 +46,7 @@ class Tracker():
   def convert_bbox_to_z(bbox):
     """
     Takes a bounding box in the form [x1,y1,x2,y2] and returns z in the form
-      [x,y,s,r] where x,y is the centre of the box and s is the scale/area and r is
-      the aspect ratio
+      [x,y] where x,y is the centre of the box
     """
     #center of the bbox
     x = (bbox[0] + bbox[2])/2.
@@ -78,6 +78,8 @@ class Tracker():
       self.hit_streak = 0
     self.time_since_update += 1
     self.history.append(Tracker.convert_state_to_rect(self.kf.x))
+    if len(self.history) > self.max_hist_length:
+      self.history = self.history[1:]
     return self.history[-1]
 
   def get_state(self):
