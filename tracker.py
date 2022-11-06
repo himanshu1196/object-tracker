@@ -4,14 +4,16 @@ import numpy as np
 class Tracker():
   count = 0
 
-  def __init__(self) -> None:
+  def __init__(self, initial_x = None):
     #define constant velocity model
     # dim_x is size of state vector (x, y, v_x, v_y) in this case
     # dim_z is size of measurement vector from the sensors (det_x, det_y) in this case
     self.kf = KalmanFilter(dim_x=4, dim_z=2)
 
     # Assign the initial value for the state (position and velocity)
-    self.kf.x = np.array([500., 300., 0., 0.])
+    self.kf.x = np.array([0., 0., 0., 0.])
+    if initial_x is not None:
+      self.kf.x = initial_x
 
     # Define the state transition matrix:
     self.kf.F = np.array([[1., 0., 1., 0.],
@@ -22,13 +24,14 @@ class Tracker():
     self.kf.H = np.array([[1., 0., 0., 0.], [0., 1., 0., 0.]])
 
     # Define the covariance matrix. Here I take advantage of the fact that P already contains np.eye(dim_x), and just multiply by the uncertainty
+    self.kf.P[:2,:2] *= 10.
     self.kf.P[2:,2:] *= 1000. #give high uncertainty to the unobservable initial velocities
 
     # Now assign the measurement noise.
-    self.kf.R[:,:] *= 5.
+    self.kf.R[:,:] *= 100.
 
     # assign the process noise. 
-    self.kf.Q *= 0.01
+    self.kf.Q *= 0.1
 
     self.time_since_update = 0
     self.id = Tracker.count
@@ -37,6 +40,7 @@ class Tracker():
     self.hits = 0
     self.hit_streak = 0
     self.age = 0
+
 
   def convert_bbox_to_z(bbox):
     """
@@ -81,3 +85,5 @@ class Tracker():
     Returns the rectangle around current center estimate.
     """
     return Tracker.convert_state_to_rect(self.kf.x)
+
+
